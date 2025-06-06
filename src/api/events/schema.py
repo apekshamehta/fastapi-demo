@@ -1,10 +1,15 @@
 from typing import List
 from pydantic import BaseModel
 
+class EventCreateSchema(BaseModel):
+    id: int
+    
+
 
 class EventSchema(BaseModel):
-    id: str
+    id: int
     
 
 class EventListSchema(BaseModel):
-    results: List[EventSchema]
+    itmes: List[EventSchema]
+    count: int
