@@ -1,6 +1,10 @@
 import os
-from fastapi import APIRouter
-from .schema import EventSchema,EventListSchema,EventCreateSchema,EventUpdateSchema
+from fastapi import APIRouter,Depends
+from sqlmodel import Session
+from api.db.session import get_session
+
+
+from .models import EventModel,EventListSchema,EventCreateSchema,EventUpdateSchema
 router = APIRouter()
 from api.db.config import DATABASE_URL
 
@@ -17,25 +21,27 @@ async def read_events() -> EventListSchema:
     
     
 #POST /api/events/
-@router.post("/")
-async def create_event(payload: EventCreateSchema) -> EventSchema:
+@router.post("/",response_model=EventModel)
+async def create_event(
+    payload: EventCreateSchema,
+    session:Session=Depends(get_session)):
     # a single row
     print(payload)
-    data = payload.model_dump()
-    return {
-        "id" : 123,
-        **data
-    }
+    obj = EventModel.model_validate(data)
+    session.add(obj)
+    session.commit()
+    session.refresh(obj)
+    return obj
 
 @router.get("/{event_id}")
-async def get_event(event_id: str) -> EventSchema:
+async def get_event(event_id: str) -> EventModel:
     # a single row
     return {
         "id" : event_id
     }
 
 @router.put("/{event_id}")
-async def update_event(event_id: int, payload: EventUpdateSchema) -> EventSchema:
+async def update_event(event_id: int, payload: EventUpdateSchema) -> EventModel:
     # a single row
     print(event_id)
     print("--------------------------------next is payload--------------------------------")
