@@ -26,5 +26,5 @@ class EventUpdateSchema(SQLModel):
 # {"id":12}
 
 class EventListSchema(SQLModel):
-    itmes: List[EventModel]
+    results: List[EventModel]
     count: int
